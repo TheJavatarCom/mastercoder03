@@ -15,8 +15,8 @@ import static com.thejavatar.mastercoder03.Application.DECIMAL_SEPARATOR;
 import static com.thejavatar.mastercoder03.Application.PRECISION;
 import static com.thejavatar.mastercoder03.converter.BigDecimalPowSupport.pow;
 import static com.thejavatar.mastercoder03.converter.CharacterToDecimalMapping.asChar;
-import static com.thejavatar.mastercoder03.converter.convertingFromDecimal.forEachActions.ForEachActionFactory.rewriteFollowingElements;
-import static com.thejavatar.mastercoder03.converter.convertingFromDecimal.forEachActions.ForEachActionFactory.rewriteToListIfDifferenetThanZero;
+import static com.thejavatar.mastercoder03.converter.convertingFromDecimal.forEachActions.ForEachActionFactory.rewriteThisAndFollowingElements;
+import static com.thejavatar.mastercoder03.converter.convertingFromDecimal.forEachActions.ForEachActionFactory.ignoreZeroCharacter;
 import static com.thejavatar.mastercoder03.converter.forEachSupport.ForEachBuilder.forEach;
 import static com.thejavatar.mastercoder03.converter.ifSupport.IfBuilder.when;
 import static com.thejavatar.mastercoder03.converter.ifSupport.IfReturningValueBuilder.returnValue;
@@ -162,9 +162,9 @@ class FractionPartConverter {
                     List<Character> reversedCharacters = Lists.reverse(characters);
                     List<Character> listWithoutZeros = new ArrayList<>();
                     forEach(reversedCharacters)
-                            .breakWhen(new BreakWhenCharacterIsDifferentThanZero())
-                            .onBreak(rewriteFollowingElements(listWithoutZeros))
-                            .perform(rewriteToListIfDifferenetThanZero(listWithoutZeros));
+                            .breakWhen(characterIsDifferentThanZero())
+                            .onBreak(rewriteThisAndFollowingElements(listWithoutZeros))
+                            .perform(ignoreZeroCharacter());
                     return StringUtils.join(Lists.reverse(listWithoutZeros), "");
                 }
             };
@@ -174,11 +174,13 @@ class FractionPartConverter {
             return DECIMAL_SEPARATOR + result;
         }
 
-        private class BreakWhenCharacterIsDifferentThanZero implements BreakCondition<Character> {
-            @Override
-            public boolean breakLoopCondition(Character currentElement, List<Character> list) {
-                return currentElement.compareTo('0') != 0;
-            }
+        private BreakCondition<Character> characterIsDifferentThanZero() {
+            return new BreakCondition<Character>() {
+                @Override
+                public boolean breakLoopCondition(Character currentElement, List<Character> list) {
+                    return currentElement.compareTo('0') != 0;
+                }
+            };
         }
     }
 }

@@ -11,11 +11,14 @@ import java.util.List;
  */
 public class ForEachActionFactory {
 
-    public static ForEachAction rewriteFollowingElements(List<Character> newList) {
+    public static ForEachAction rewriteThisAndFollowingElements(List<Character> newList) {
         return new RewriteFollowingElements(newList);
     }
 
-    public static ForEachAction rewriteToListIfDifferenetThanZero(List<Character> newList) {
-        return new RewriteToListIfDifferentThanZero(newList);
+    public static ForEachAction ignoreZeroCharacter() {
+        return new ForEachAction<Character>() {
+            @Override
+            public void perform(Character currentElement, int currentElementPosition, List<Character> list) {}
+        };
     }
 }
